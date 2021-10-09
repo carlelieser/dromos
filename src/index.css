@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+    user-select: none !important;
+}
+
+body::-webkit-scrollbar {
+    display: none;
+}
+
+.z-100 {
+    z-index: 100;
+}
+
+.hover\:pointer-events-auto:hover {
+    pointer-events: auto !important;
+}
+
+.group:hover .group-hover\:pointer-events-auto {
+    pointer-events: auto !important;
+}

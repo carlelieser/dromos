@@ -1,0 +1,41 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+	<style>
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
+	</style>
+	<title>Capture window</title>
+</head>
+<body>
+<script>
+	const uuid = require("uuid-random");
+	const { ipcRenderer } = require("electron");
+
+	window.addEventListener("mousedown", (e) => {
+		console.log(e.clientX, e.clientY);
+		ipcRenderer.send("get-mouse-position");
+		ipcRenderer.on("mouse-position-received", (e, position) => {
+			ipcRenderer.send("event-recorded", {
+				id: uuid(),
+				type: "mouse",
+				position
+			});
+		})
+	});
+
+	window.addEventListener("keyup", (e) => {
+		ipcRenderer.send("event-recorded", {
+			id: uuid(),
+			type: "keyboard",
+			message: String.fromCharCode(e.which)
+		});
+	});
+
+
+</script>
+</body>
+
+</html>
