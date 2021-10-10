@@ -19,7 +19,7 @@ const Button = ({ label, icon, size, bg = "white", color = "black", onClick, dis
 			}}>
 			{icon ? icon : null}
 			{label ? <div
-				className={"font-semibold uppercase text-xs group-hover:text-white" + (color ? " text-" + color : "")}>{label}</div> : null}
+				className={"font-semibold uppercase whitespace-nowrap text-xs group-hover:text-white" + (color ? " text-" + color : "")}>{label}</div> : null}
 		</div>
 	);
 };

@@ -86,14 +86,13 @@ ipcMain.on("execute-action", (e, action) => {
 		if (!action.position) return;
 		robot.moveMouse(action.position.x, action.position.y);
 		robot.mouseClick("left");
-	} else {
+	} else if (action.type === "keyboard") {
 		if (!action.message) return;
 		robot.keyTap(action.message);
 	}
 });
 
 ipcMain.on("get-mouse-position", (e) => {
-	console.log("mouse position", robot.getMousePos())
 	e.reply("mouse-position-received", robot.getMousePos());
 });
 

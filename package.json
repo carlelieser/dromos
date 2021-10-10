@@ -25,8 +25,9 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "start": "craco start & electron . --env=development",
-    "build": "craco build",
+    "init:robotjs": "npm rebuild --runtime=electron --target=15.1.2 --disturl=https://atom.io/download/atom-shell --abi=48",
+    "start": "npm run init:robotjs && craco start & electron . --env=development",
+    "build": "npm run init:robotjs && craco build",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -49,8 +50,9 @@
   },
   "devDependencies": {
     "autoprefixer": "^9.8.8",
-    "electron": "^15.1.1",
+    "electron": "^15.1.2",
     "postcss": "^7.0.39",
+    "prettier": "2.4.1",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.2.16"
   }
 }

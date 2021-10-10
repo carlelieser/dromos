@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import Shortcut, { IShortcut } from "./shortcut";
+import React from "react";
+import Shortcut from "./shortcut";
 import emptyState from "../empty-state.svg";
 import Button from "./button";
 import {
@@ -8,14 +8,13 @@ import {
 } from "react-icons/all";
 import AddShortcutModal from "./modals/add-shortcut";
 
-const Shortcuts = ({ shortcuts, showAddShortcutModal, openAddShortcutModal, closeAddShortcutModal, addShortcut }) => {
-
+const Shortcuts = ({ shortcuts, showAddShortcutModal, openAddShortcutModal, closeAddShortcutModal, addShortcut, executeActions }) => {
 	return (
 		<div className={"space-y-4 px-6 pt-12 bg-gray-100 w-full h-full"}>
-			<AddShortcutModal show={showAddShortcutModal} close={closeAddShortcutModal} addShortcut={addShortcut} />
+			<AddShortcutModal title={"Add shortcut"} show={showAddShortcutModal} close={closeAddShortcutModal} addShortcut={addShortcut} />
 			<div className={"z-0"}>
 				{shortcuts.length ? <div className={"space-y-4"}>
-					<div className={"flex items-center justify-between mt-4"}>
+					<div className={"flex items-center justify-between mt-6"}>
 						<div className={"text-2xl font-semibold"}>Shortcuts</div>
 						<div>
 							<Button icon={<MdAdd color={"white"} />} size={6} bg={"indigo-500"} color={"white"}
@@ -26,7 +25,7 @@ const Shortcuts = ({ shortcuts, showAddShortcutModal, openAddShortcutModal, clos
 						{
 							shortcuts.map((shortcut) => {
 								return (
-									<Shortcut {...shortcut} />
+									<Shortcut {...shortcut} executeActions={executeActions} addShortcut={addShortcut} />
 								);
 							})
 						}

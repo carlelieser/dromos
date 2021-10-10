@@ -21,3 +21,7 @@ body::-webkit-scrollbar {
 .group:hover .group-hover\:pointer-events-auto {
     pointer-events: auto !important;
 }
+
+.hide-scrollbar::-webkit-scrollbar{
+	display: none;
+}
