@@ -2,8 +2,7 @@ const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const url = require("url");
 
-const env = process.argv.find((argument) => argument.includes("env="));
-const dev = env ? env.split("=")[1] === "dev" : true;
+const dev = true;
 
 const Store = require("electron-store");
 const store = new Store();
@@ -25,6 +24,7 @@ function createWindow() {
 		maxWidth: size.width,
 		maxHeight: size.height,
 		resizable: false,
+		show: false,
 		webPreferences: {
 			nodeIntegration: true,
 			contextIsolation: false,
@@ -32,16 +32,23 @@ function createWindow() {
 		}
 	});
 
-	const url = dev ? "http://localhost:3000" : url.format({
+	const page = dev ? "http://localhost:3000" : url.format({
 		pathname: path.join(__dirname, "build", "index.html"),
 		protocol: "file",
 		slashes: true
 	});
 
 	mainWindow.setMenuBarVisibility(false);
-	mainWindow.loadURL(url);
+	mainWindow.setAlwaysOnTop(true, "screen-saver");
 
-	if (dev) mainWindow.webContents.openDevTools();
+	if (dev) mainWindow.loadURL(page);
+	else mainWindow.loadFile("./build/index.html");
+
+	mainWindow.once("ready-to-show", () => {
+		mainWindow.show();
+	});
+
+	mainWindow.webContents.openDevTools();
 }
 
 const createCaptureWindow = () => {
@@ -71,14 +78,25 @@ const stopRecording = () => {
 };
 
 ipcMain.on("begin-recording", (event, arg) => {
-	mainWindow.setAlwaysOnTop(true, "screen-saver");
 	captureWindow = createCaptureWindow();
 });
 
 ipcMain.on("event-recorded", (e, event) => {
-	console.log(event);
 	stopRecording();
 	mainWindow.webContents.send("add-shortcut-action", event);
+});
+
+ipcMain.on("store-item", (e, item) => {
+	store.set(item.key, item.value);
+});
+
+ipcMain.on("get-item", (e, key) => {
+	const item = store.get(key);
+	e.returnValue = item;
+});
+
+ipcMain.on("remove-item", (e, key) => {
+	store.delete(key);
 });
 
 ipcMain.on("execute-action", (e, action) => {

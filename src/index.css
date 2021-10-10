@@ -25,3 +25,7 @@ body::-webkit-scrollbar {
 .hide-scrollbar::-webkit-scrollbar{
 	display: none;
 }
+
+.pointer-events-none *{
+    pointer-events: none !important;
+}

@@ -1,22 +1,24 @@
 import React, { useEffect, useState } from "react";
 import Button from "../button";
 import {
-	CgRecord,
-	MdArrowDownward,
+	BiMessageAltDots,
+	CgRecord, CgTrash,
+	MdArrowUpward,
 	MdClose,
-	MdKeyboard,
-	MdMouse,
-	MdPending,
-	MdPendingActions,
-	MdSave,
-	MdTimer
+	MdMoreVert,
+	MdTimer, TiWarningOutline
 } from "react-icons/all";
 import AddDelayModal from "./add-delay";
 import { ipcRenderer } from "electron";
 import { IAction, IShortcut } from "../shortcut";
 import emptyState from "../../actions-empty-state.svg";
 import uuid from "uuid-random";
-import Modal from "../../modal";
+import Modal from "../modal";
+import Menu, { MenuItem } from "../menu";
+import { MdAdd } from "react-icons/md";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import UseAnimations from "react-useanimations";
+import infinity from "react-useanimations/lib/infinity";
 
 const clone = require("clone");
 
@@ -25,10 +27,11 @@ interface IAddShortcutModalProps {
 	show: boolean;
 	close: () => void;
 	addShortcut: (shortcut: IShortcut) => void;
+	removeShortcut: (id: string) => void;
 	defaultShortcut?: IShortcut;
 }
 
-const AddShortcutModal = ({ title, show, close, addShortcut, defaultShortcut}: IAddShortcutModalProps) => {
+const AddShortcutModal = ({ title, show, close, addShortcut, removeShortcut, defaultShortcut }: IAddShortcutModalProps) => {
 	const [shortcut, setShortcut] = useState<IShortcut>();
 	const [actions, updateActions] = useState<Array<IAction>>([]);
 	const [recordingAction, setRecordingAction] = useState<boolean>(false);
@@ -36,11 +39,11 @@ const AddShortcutModal = ({ title, show, close, addShortcut, defaultShortcut}: I
 
 	const openAddDelayModal = () => {
 		setAddDelayModalVisible(true);
-	}
+	};
 
 	const closeAddDelayModal = () => {
 		setAddDelayModalVisible(false);
-	}
+	};
 
 	const removeAction = (index) => {
 		let actionsCopy = clone(actions);
@@ -54,20 +57,20 @@ const AddShortcutModal = ({ title, show, close, addShortcut, defaultShortcut}: I
 		const promptAction = {
 			id: uuid(),
 			type: "prompt"
-		}
+		};
 
 		handleAddShortcutAction(null, promptAction);
-	}
+	};
 
 	const addDelayAction = (duration: number) => {
 		const delayAction = {
 			id: uuid(),
 			type: "delay",
 			duration
-		}
+		};
 
 		handleAddShortcutAction(null, delayAction);
-	}
+	};
 
 	const beginRecording = () => {
 		setRecordingAction(true);
@@ -89,18 +92,45 @@ const AddShortcutModal = ({ title, show, close, addShortcut, defaultShortcut}: I
 		let shortcutCopy = clone(shortcut);
 		shortcutCopy.name = value;
 		setShortcut(shortcutCopy);
+	};
+
+	const reorder = (list, startIndex, endIndex) => {
+		const result = Array.from(list);
+		const [removed] = result.splice(startIndex, 1);
+		result.splice(endIndex, 0, removed);
+
+		return result;
+	};
+
+	const onDragEnd = (result) => {
+		if (!result.destination) return;
+		const items = reorder(actions, result.source.index, result.destination.index) as Array<IAction>;
+		updateActions(items);
+	};
+
+	const handleRemove = () => {
+		if (!shortcut?.id) return;
+		removeShortcut(shortcut.id);
 	}
+
+	const cancelRecording = () => {
+		ipcRenderer.send("stop-recording");
+		setRecordingAction(false);
+	};
 
 	useEffect(() => {
 		updateActions(defaultShortcut ? defaultShortcut.actions : []);
 		setShortcut(defaultShortcut ?? {
-				id: uuid(),
-				actions: [],
-				name: "",
-				createdOn: Date.now()
-			});
+			id: uuid(),
+			actions: [],
+			name: "",
+			createdOn: Date.now()
+		});
 		ipcRenderer.removeAllListeners("add-shortcut-action");
 		ipcRenderer.on("add-shortcut-action", handleAddShortcutAction);
+		return () => {
+			ipcRenderer.removeAllListeners("add-shortcut-action");
+		}
 	}, []);
 
 	useEffect(() => {
@@ -122,82 +152,123 @@ const AddShortcutModal = ({ title, show, close, addShortcut, defaultShortcut}: I
 		setShortcut(sc);
 	}, [actions]);
 
-	useEffect(() => {
-		console.log(shortcut);
-	}, [shortcut]);
-
 	return (
 		<>
 			<Modal title={title} show={show} close={close}>
-				<AddDelayModal show={addDelayModalVisible} close={closeAddDelayModal} addDelayAction={addDelayAction}/>
+				<AddDelayModal show={addDelayModalVisible} close={closeAddDelayModal} addDelayAction={addDelayAction} />
 				<div>
 					<div className={"uppercase text-xs opacity-70"}>Name</div>
 					<input type={"text"}
-							value={shortcut?.name}
-							onChange={handleShortcutNameChange}
+						   value={shortcut?.name}
+						   onChange={handleShortcutNameChange}
 						   className={"text-xl outline-none font-semibold w-full border-b-2 border-gray-100 py-2 focus:border-indigo-500 transition ease-in-out"}
 						   placeholder={"Untitled"} />
 				</div>
-				<div className={"mt-1"}>
-					<div className={"font-semibold"}>Sequence</div>
-					{actions.length ? <div className={"grid gap-4 grid-cols-3 hide-scrollbar mb-2 w-full py-4"} style={{maxHeight: 140, overflowX: "hidden"}}>
-						{actions.map((action, index) => {
-							return (
-								<div
-									className={"px-3 py-3 rounded-lg bg-indigo-50 text-xs flex flex-col items-center justify-center font-semibold relative group hover:bg-indigo-500 transition text-center"}>
-									<div
-										className={"cursor-pointer transition ease-in-out group-hover:opacity-100 opacity-0 pointer-events-none group-hover:pointer-events-auto top-0 right-0 w-5 h-5 rounded-full absolute bg-black flex items-center justify-center hover:bg-red-500 transform scale-75 group-hover:scale-100 group -mr-1 -mt-1"}
-										onClick={removeAction.bind(this, index)}>
-										<MdClose className={"text-white opacity-90"} /></div>
-										<div className="rounded-full w-8 h-8 bg-indigo-100 flex items-center group-hover:bg-white justify-center text-indigo-800 mb-1">
-											{index + 1}
-											</div>
+				<div className={"mt-4"}>
+					<div className={"flex items-center justify-between"}>
+						<div className={"font-semibold"}>Sequence</div>
+						<div className={"flex items-center space-x-4"}>
+							<Button icon={<MdAdd color={"white"} />} size={6} bg={"indigo-500"} color={"white"}
+									onClick={beginRecording} />
+							<Menu menuButton={<Button icon={<MdMoreVert />} bg={"gray-50"} color={"white"} size={6} />}>
+								<MenuItem label={"Record action"} icon={CgRecord} onClick={beginRecording} />
+								<MenuItem label={"Add prompt"} icon={BiMessageAltDots} onClick={addPromptAction} />
+								<MenuItem label={"Add delay"} icon={MdTimer} onClick={openAddDelayModal} />
+							</Menu>
+						</div>
+					</div>
+					{actions.length ? <DragDropContext onDragEnd={onDragEnd}>
+						<Droppable droppableId={"actions"}>
+							{(provided, snapshot) => (
+								<div className={"gap-4 flex flex-col hide-scrollbar my-2 w-full pb-4 pt-2"}
+									 style={{ maxHeight: 200, overflowX: "hidden" }}
+									 {...provided.droppableProps}
+									 ref={provided.innerRef}
+								>
+									{actions.map((action, index) => {
+										return (
+											<Draggable key={action.id} index={index} draggableId={action.id}>
+												{(provided, snapshot) => (
+													<div
+														ref={provided.innerRef}
+														style={provided.draggableProps.style}
+														{...provided.draggableProps}
+														{...provided.dragHandleProps}
 
-									{/* {action.type === "mouse" ? <MdMouse className="group-hover:text-white text-indigo-900" size={24} /> :
+														className={`px-3 py-3 rounded-lg text-xs flex items-center space-x-4 font-semibold relative group hover:bg-indigo-500 transition text-center ${snapshot.isDragging ? "bg-white shadow-lg" : "bg-indigo-50"}`}>
+														<div
+															className={"cursor-pointer transition ease-in-out group-hover:opacity-100 opacity-0 pointer-events-none group-hover:pointer-events-auto top-0 right-0 mr-1 mt-1 w-5 h-5 rounded-full absolute bg-black flex items-center justify-center hover:bg-red-500 transform scale-75 group-hover:scale-100 group shadow-lg"}
+															onClick={removeAction.bind(this, index)}>
+															<MdClose className={"text-white opacity-90"} /></div>
+														<div
+															className="rounded-full w-8 h-8 bg-indigo-100 flex items-center group-hover:bg-white justify-center text-indigo-800 mb-1 group-hover:shadow-lg">
+															{index + 1}
+														</div>
+
+														{/* {action.type === "mouse" ? <MdMouse className="group-hover:text-white text-indigo-900" size={24} /> :
 										<MdKeyboard className="group-hover:text-white text-indigo-900" size={24} />} */}
 
-									<div className={"opacity-90 text-xs flex flex-col items-center mt-1 space-y-1"}>
-										{ action.position || action.message || action.duration ?
-											<div className="group-hover:text-white">
-											{action.position ? <div>{action.position.x}, {action.position.y}</div> : null }
-											
-											{action.message?.length ? <div>"{action.message}"</div> : null}
+														<div
+															className={"opacity-90 text-xs flex flex-col text-left mt-1 space-y-1"}>
+															{action.position || action.message || action.duration ?
+																<div className="group-hover:text-white">
+																	{action.position ?
+																		<div>{action.position.x}, {action.position.y}</div> : null}
 
-											{action.duration ? <div className="space-x-1 whitespace-nowrap flex w-full"><div>{action.duration}</div><div className="font-semibold opacity-80">MS</div></div> : null}
-										</div>
-										: null}
-										<div className={"text-xs capitalize opacity-70 group-hover:text-white"}>{action.type}</div>
-									</div>
+																	{action.message?.length ?
+																		<div>{action.message === "\t" ? "TAB" : action.message === "\r" ? "ENTER" : `"${action.message}"`}</div> : null}
+
+																	{action.duration ?
+																		<div
+																			className="space-x-1 whitespace-nowrap flex w-full">
+																			<div>{action.duration}</div>
+																			<div
+																				className="font-semibold opacity-80">MS
+																			</div>
+																		</div> : null}
+																</div>
+																: null}
+															<div
+																className={"text-xs capitalize opacity-70 group-hover:text-white"}>{action.type}</div>
+														</div>
+													</div>
+												)}
+											</Draggable>
+										);
+									})}
+									{provided.placeholder}
 								</div>
-							);
-						})}
-					</div> : <div className={"flex flex-col items-center p-4 text-center"}>
+							)}
+						</Droppable>
+					</DragDropContext> : <div className={"flex flex-col items-center p-4 text-center"}>
 						<div className={"p-4"}>
 							<img src={emptyState} className={"h-14"} />
 						</div>
 						<div className={"space-y-2"}>
-							<div className={"font-semibold opacity-80 text-sm"}>Create a sequence by recording actions.</div>
+							<div className={"font-semibold opacity-80 text-sm"}>Create a sequence by recording
+								actions.
+							</div>
 						</div>
 					</div>}
 				</div>
-				<div className={"flex justify-end mt-4"}>
-					<div className={"space-y-2"}>
-						<div className="flex items-center justify-end">
-<Button label={recordingAction ? "Waiting" : "Record action"}
-								icon={recordingAction ? <MdPending size={24} className={"text-gray-700"} /> :
-									<CgRecord size={24} color={"white"} />} size={12}
-								bg={recordingAction ? "gray-200" : "indigo-500"}
-								color={recordingAction ? "text-gray-700" : "white"} onClick={beginRecording} disabled={recordingAction}/>
+				<div className={"mt-2 flex items-center justify-end"}>
+					{
+						recordingAction ? <div
+							className={"rounded-full flex items-center space-x-2 px-6 py-2 bg-yellow-500 font-semibold text-xs"}>
+							<UseAnimations size={24} animation={infinity} />
+							<div>Waiting for action</div>
+							<div
+								className={"uppercase transition ease-in-out opacity-50 hover:opacity-90 cursor-pointer text-xs"}
+								onClick={cancelRecording}>Cancel
 							</div>
-								<div className={"scale-75 flex items-center space-x-4 justify-end transform right-0 -mr-10"}>
-									<Button label="Wait for prompt" icon={<MdPending size={24}/>} bg="gray-100" onClick={addPromptAction}/>
-							<Button label="Delay" icon={<MdTimer size={24}/>} bg="gray-100" onClick={openAddDelayModal}/>
-								</div>
-						<div className={"scale-75 flex items-center space-x-4 justify-end transform right-0 -mr-10"}>
-							<Button label={"Save"} icon={<MdArrowDownward />} bg={"green-400"}
-									onClick={saveShortcut} />
-						</div>
-					</div>
+						</div> : null
+					}
+				</div>
+				<div className="flex items-center justify-end space-x-4 mt-4">
+					{defaultShortcut ? <Button label={"Remove"} icon={<CgTrash />} bg={"gray-100"} onClick={handleRemove}/> : null}
+					<Button label={defaultShortcut ? "Update" : "Add shortcut"}
+							icon={defaultShortcut ? <MdArrowUpward /> : <MdAdd />} bg={"green-300"}
+							onClick={saveShortcut} />
 				</div>
 			</Modal>
 		</>

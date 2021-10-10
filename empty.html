@@ -15,7 +15,6 @@
 	const { ipcRenderer } = require("electron");
 
 	window.addEventListener("mousedown", (e) => {
-		console.log(e.clientX, e.clientY);
 		ipcRenderer.send("get-mouse-position");
 		ipcRenderer.on("mouse-position-received", (e, position) => {
 			ipcRenderer.send("event-recorded", {

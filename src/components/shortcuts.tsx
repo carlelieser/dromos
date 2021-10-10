@@ -8,13 +8,22 @@ import {
 } from "react-icons/all";
 import AddShortcutModal from "./modals/add-shortcut";
 
-const Shortcuts = ({ shortcuts, showAddShortcutModal, openAddShortcutModal, closeAddShortcutModal, addShortcut, executeActions }) => {
+const Shortcuts = ({
+					   shortcuts,
+					   showAddShortcutModal,
+					   openAddShortcutModal,
+					   closeAddShortcutModal,
+					   addShortcut,
+					   removeShortcut,
+					   executeActions
+				   }) => {
 	return (
 		<div className={"space-y-4 px-6 pt-12 bg-gray-100 w-full h-full"}>
-			<AddShortcutModal title={"Add shortcut"} show={showAddShortcutModal} close={closeAddShortcutModal} addShortcut={addShortcut} />
+			<AddShortcutModal title={"Add shortcut"} show={showAddShortcutModal} close={closeAddShortcutModal}
+							  addShortcut={addShortcut} removeShortcut={removeShortcut} />
 			<div className={"z-0"}>
 				{shortcuts.length ? <div className={"space-y-4"}>
-					<div className={"flex items-center justify-between mt-6"}>
+					<div className={"flex items-center justify-between mt-8"}>
 						<div className={"text-2xl font-semibold"}>Shortcuts</div>
 						<div>
 							<Button icon={<MdAdd color={"white"} />} size={6} bg={"indigo-500"} color={"white"}
@@ -25,7 +34,7 @@ const Shortcuts = ({ shortcuts, showAddShortcutModal, openAddShortcutModal, clos
 						{
 							shortcuts.map((shortcut) => {
 								return (
-									<Shortcut {...shortcut} executeActions={executeActions} addShortcut={addShortcut} />
+									<Shortcut {...shortcut} executeActions={executeActions} addShortcut={addShortcut} removeShortcut={removeShortcut}/>
 								);
 							})
 						}

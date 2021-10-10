@@ -1,5 +1,5 @@
 import React, { ReactChildren, ReactElement } from "react";
-import Button from "./components/button";
+import Button from "./button";
 import { MdClose } from "react-icons/all";
 
 interface IModalProps {
