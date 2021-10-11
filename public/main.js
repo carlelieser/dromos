@@ -2,7 +2,7 @@ const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const url = require("url");
 
-const dev = true;
+const dev = !!process.argv.find((argument) => argument.includes("=dev"));
 
 const Store = require("electron-store");
 const store = new Store();
@@ -10,6 +10,8 @@ const robot = require("robotjs");
 
 let mainWindow = null;
 let captureWindow = null;
+
+app.commandLine.appendSwitch("disable-renderer-backgrounding");
 
 function createWindow() {
 	const size = {
@@ -19,10 +21,6 @@ function createWindow() {
 	mainWindow = new BrowserWindow({
 		width: size.width,
 		height: size.height,
-		minWidth: size.width,
-		minHeight: size.height,
-		maxWidth: size.width,
-		maxHeight: size.height,
 		resizable: false,
 		show: false,
 		webPreferences: {
@@ -32,11 +30,13 @@ function createWindow() {
 		}
 	});
 
-	const page = dev ? "http://localhost:3000" : url.format({
-		pathname: path.join(__dirname, "build", "index.html"),
-		protocol: "file",
-		slashes: true
-	});
+	const page = dev
+		? "http://localhost:3000"
+		: url.format({
+				pathname: path.join(__dirname, "index.html"),
+				protocol: "file",
+				slashes: true
+		  });
 
 	mainWindow.setMenuBarVisibility(false);
 	mainWindow.setAlwaysOnTop(true, "screen-saver");
@@ -48,7 +48,7 @@ function createWindow() {
 		mainWindow.show();
 	});
 
-	mainWindow.webContents.openDevTools();
+	if (dev) mainWindow.webContents.openDevTools();
 }
 
 const createCaptureWindow = () => {
@@ -70,7 +70,7 @@ const createCaptureWindow = () => {
 
 const stopRecording = () => {
 	if (captureWindow) {
-		captureWindow.close();
+		captureWindow.destroy();
 		captureWindow = null;
 	} else {
 		console.log("Capture window does not exist.");
@@ -106,7 +106,8 @@ ipcMain.on("execute-action", (e, action) => {
 		robot.mouseClick("left");
 	} else if (action.type === "keyboard") {
 		if (!action.message) return;
-		robot.keyTap(action.message);
+		if (action.message.length === 1) robot.keyTap(action.message);
+		else robot.typeString(action.message);
 	}
 });
 
@@ -116,15 +117,22 @@ ipcMain.on("get-mouse-position", (e) => {
 
 ipcMain.on("stop-recording", stopRecording);
 
+ipcMain.on("show-main-window", () => {
+	mainWindow.show();
+});
+
+ipcMain.on("hide-main-window", (e) => {
+	mainWindow.hide();
+});
+
 app.whenReady().then(() => {
 	createWindow();
 
-	app.on("activate", function() {
+	app.on("activate", function () {
 		if (BrowserWindow.getAllWindows().length === 0) createWindow();
 	});
 });
 
-app.on("window-all-closed", function() {
+app.on("window-all-closed", function () {
 	if (process.platform !== "darwin") app.quit();
 });
-

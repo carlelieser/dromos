@@ -3,29 +3,29 @@
 @tailwind utilities;
 
 * {
-    user-select: none !important;
+	user-select: none !important;
 }
 
 body::-webkit-scrollbar {
-    display: none;
-}
-
-.z-100 {
-    z-index: 100;
-}
-
-.hover\:pointer-events-auto:hover {
-    pointer-events: auto !important;
-}
-
-.group:hover .group-hover\:pointer-events-auto {
-    pointer-events: auto !important;
-}
-
-.hide-scrollbar::-webkit-scrollbar{
 	display: none;
 }
 
-.pointer-events-none *{
-    pointer-events: none !important;
+.z-100 {
+	z-index: 100;
+}
+
+.hover\:pointer-events-auto:hover {
+	pointer-events: auto !important;
+}
+
+.group:hover .group-hover\:pointer-events-auto {
+	pointer-events: auto !important;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+	display: none;
+}
+
+.pointer-events-none * {
+	pointer-events: none !important;
 }

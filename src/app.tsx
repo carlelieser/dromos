@@ -9,17 +9,21 @@ import { ipcRenderer } from "electron";
 interface IPromptPromiseRef {
 	promise: Promise<unknown>;
 	resolve: any;
+	reject: any;
 }
 
 const App = () => {
 	const [shortcuts, setShortcuts] = useState<Array<IShortcut>>([]);
-	const [showAddShortcutModal, setShowAddShortcutModal] = useState<boolean>(false);
+	const [showAddShortcutModal, setShowAddShortcutModal] =
+		useState<boolean>(false);
 	const [showPromptModal, setShowPromptModal] = useState<boolean>(false);
 	const [promptPromise, setPromptPromise] = useState<IPromptPromiseRef>();
 
 	const addShortcut = (shortcut: IShortcut) => {
 		let shortcutCopy = [...shortcuts];
-		let prevIndex = shortcutCopy.findIndex(shortcutRef => shortcutRef.id === shortcut.id);
+		let prevIndex = shortcutCopy.findIndex(
+			(shortcutRef) => shortcutRef.id === shortcut.id
+		);
 
 		if (prevIndex > -1) {
 			shortcutCopy[prevIndex] = shortcut;
@@ -32,7 +36,9 @@ const App = () => {
 
 	const removeShortcut = (id: string) => {
 		let shortcutCopy = [...shortcuts];
-		let prevIndex = shortcutCopy.findIndex(shortcutRef => shortcutRef.id === id);
+		let prevIndex = shortcutCopy.findIndex(
+			(shortcutRef) => shortcutRef.id === id
+		);
 		shortcutCopy.splice(prevIndex, 1);
 		setShortcuts(shortcutCopy);
 	};
@@ -49,21 +55,23 @@ const App = () => {
 		setShowPromptModal(true);
 	};
 
-	const closePromptModal = () => {
-		if (promptPromise) promptPromise.resolve();
+	const closePromptModal = (continueExecution: boolean = false) => {
+		if (promptPromise) promptPromise.resolve(continueExecution);
 		setShowPromptModal(false);
 	};
 
 	const waitForPromptModalClose = () => {
-		let resolveRef;
+		let refs: any = {};
 
-		const promise = new Promise((resolve) => {
-			resolveRef = resolve;
+		const promise = new Promise((resolve, reject) => {
+			refs.resolve = resolve;
+			refs.reject = reject;
 		});
 
 		const ref: IPromptPromiseRef = {
 			promise,
-			resolve: resolveRef
+			resolve: refs.resolve,
+			reject: refs.reject
 		};
 
 		return ref;
@@ -77,22 +85,26 @@ const App = () => {
 
 	const executeActions = async (actions: Array<IAction>) => {
 		for await (const action of actions) {
-			await delay(100);
+			await delay(50);
 			if (action.type === "delay") {
 				await delay(action.duration as number);
 			} else if (action.type === "prompt") {
+				// ipcRenderer.send("show-main-window");
 				openPromptModal();
-				const promptPromise = waitForPromptModalClose();
-				setPromptPromise(promptPromise);
-				await promptPromise.promise;
+				const promptRef = waitForPromptModalClose();
+				setPromptPromise(promptRef);
+				const shouldContinue = await promptRef.promise;
+				if (!shouldContinue) break;
 			} else {
 				ipcRenderer.send("execute-action", action);
 			}
 		}
+		// ipcRenderer.send("show-main-window");
 	};
 
 	useEffect(() => {
-		const storedShortcuts = ipcRenderer.sendSync("get-item", "shortcuts") ?? [];
+		const storedShortcuts =
+			ipcRenderer.sendSync("get-item", "shortcuts") ?? [];
 		setShortcuts(storedShortcuts);
 	}, []);
 
@@ -104,12 +116,21 @@ const App = () => {
 	}, [shortcuts]);
 
 	return (
-		<div className={"bg-indigo-500 w-full h-full absolute"}>
-			<WaitForUserPrompt show={showPromptModal} close={closePromptModal} />
+		<div className={"bg-indigo-500 w-full h-full absolute overflow-hidden"}>
+			<WaitForUserPrompt
+				show={showPromptModal}
+				close={closePromptModal}
+			/>
 			<Header />
-			<Shortcuts shortcuts={shortcuts} executeActions={executeActions} showAddShortcutModal={showAddShortcutModal}
-					   addShortcut={addShortcut} removeShortcut={removeShortcut}
-					   openAddShortcutModal={openAddShortcutModal} closeAddShortcutModal={closeAddShortcutModal} />
+			<Shortcuts
+				shortcuts={shortcuts}
+				executeActions={executeActions}
+				showAddShortcutModal={showAddShortcutModal}
+				addShortcut={addShortcut}
+				removeShortcut={removeShortcut}
+				openAddShortcutModal={openAddShortcutModal}
+				closeAddShortcutModal={closeAddShortcutModal}
+			/>
 		</div>
 	);
 };

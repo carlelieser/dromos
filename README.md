@@ -1,2 +1,2 @@
 ## Dromos
-A simple app for creating shortcuts on Windows.
+A simple app for automating desktop command sequences.

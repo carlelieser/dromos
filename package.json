@@ -1,9 +1,10 @@
 {
   "name": "dromos",
-  "description": "A simple app for managing automated commands.",
+  "description": "A simple app for automating desktop command sequences.",
   "version": "0.1.0",
   "private": true,
-  "main": "main.js",
+  "main": "build/main.js",
+  "homepage": ".",
   "dependencies": {
     "@craco/craco": "^5.9.0",
     "@testing-library/jest-dom": "^5.11.4",
@@ -30,11 +31,15 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "init:robotjs": "npm rebuild --runtime=electron --target=15.1.2 --disturl=https://atom.io/download/atom-shell --abi=48",
+    "rebuild": "npm rebuild --runtime=electron --target=15.1.2 --disturl=https://atom.io/download/atom-shell --abi=48",
     "electron:dev": "electron . --env=dev",
     "electron:prod": "electron . --env=prod",
-    "start": "npm run init:robotjs && craco start & npm run electron:dev",
-    "build": "npm run init:robotjs && craco build && electron-builder",
+    "craco:start" : "craco start",
+    "craco:build": "craco build",
+    "format": "prettier --write ./src",
+    "start": "npm run craco:start & npm run electron:dev",
+    "build": "npm run rebuild && npm run craco:build",
+    "dist": "npm run build && electron-builder -w",
     "eject": "react-scripts eject"
   },
   "build": {
@@ -49,7 +54,6 @@
     },
     "files": [
       "package.json",
-      "main.js",
       "build/**/*",
       "node_modules"
     ],
