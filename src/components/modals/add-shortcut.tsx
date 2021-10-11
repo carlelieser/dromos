@@ -25,6 +25,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import UseAnimations from "react-useanimations";
 import infinity from "react-useanimations/lib/infinity";
 import AddTypingAction from "./add-typing-action";
+import ShortcutAction from "../shortcut-action";
 
 const clone = require("clone");
 
@@ -37,6 +38,40 @@ interface IAddShortcutModalProps {
 	defaultShortcut?: IShortcut;
 }
 
+const ActionMenu = ({
+	menuButton,
+	beginRecording,
+	openAddDelayModal,
+	openAddKeyboardCommandModal,
+	addPromptAction,
+	closeTarget
+}) => {
+	return (
+		<Menu closeTarget={closeTarget} menuButton={menuButton}>
+			<MenuItem
+				label={"Record action"}
+				icon={CgRecord}
+				onClick={beginRecording}
+			/>
+			<MenuItem
+				label={"Add prompt"}
+				icon={BiMessageAltDots}
+				onClick={addPromptAction}
+			/>
+			<MenuItem
+				label={"Add delay"}
+				icon={MdTimer}
+				onClick={openAddDelayModal}
+			/>
+			<MenuItem
+				label={"Type message"}
+				icon={MdKeyboard}
+				onClick={openAddKeyboardCommandModal}
+			/>
+		</Menu>
+	);
+};
+
 const AddShortcutModal = ({
 	title,
 	show,
@@ -48,10 +83,20 @@ const AddShortcutModal = ({
 	const [shortcut, setShortcut] = useState<IShortcut>();
 	const [actions, updateActions] = useState<Array<IAction>>([]);
 	const [recordingAction, setRecordingAction] = useState<boolean>(false);
+	const [actionPlacementIndex, setActionPlacementIndex] =
+		useState<number>(-1);
 	const [addDelayModalVisible, setAddDelayModalVisible] =
 		useState<boolean>(false);
 	const [addKeyboardCommandModalVisible, setAddKeyboardCommandModalVisible] =
 		useState<boolean>(false);
+
+	const updateActionPlacementIndex = (
+		index: number,
+		callback?: () => void
+	) => {
+		setActionPlacementIndex(index);
+		if (typeof callback === "function") callback();
+	};
 
 	const openAddDelayModal = () => {
 		setAddDelayModalVisible(true);
@@ -112,7 +157,15 @@ const AddShortcutModal = ({
 
 	const handleAddShortcutAction = (e, action) => {
 		setRecordingAction(false);
-		updateActions((prevActions) => [...prevActions, action]);
+		if (actionPlacementIndex === -1) {
+			updateActions((prevActions) => [...prevActions, action]);
+		} else {
+			updateActions((prevActions) => {
+				let actions = [...prevActions];
+				actions.splice(actionPlacementIndex, 0, action);
+				return actions;
+			});
+		}
 	};
 
 	const handleShortcutNameChange = (e) => {
@@ -220,37 +273,30 @@ const AddShortcutModal = ({
 							<Button
 								icon={MdAdd}
 								className={"bg-indigo-500 text-white w-6 h-6"}
-								onClick={beginRecording}
+								onClick={updateActionPlacementIndex.bind(
+									this,
+									-1,
+									beginRecording
+								)}
 							/>
-							<Menu
+							<ActionMenu
+								closeTarget={null}
 								menuButton={
 									<Button
 										icon={MdMoreVert}
 										className={"bg-gray-50 w-6 h-6"}
+										onClick={() => {
+											updateActionPlacementIndex(-1);
+										}}
 									/>
 								}
-							>
-								<MenuItem
-									label={"Record action"}
-									icon={CgRecord}
-									onClick={beginRecording}
-								/>
-								<MenuItem
-									label={"Add prompt"}
-									icon={BiMessageAltDots}
-									onClick={addPromptAction}
-								/>
-								<MenuItem
-									label={"Add delay"}
-									icon={MdTimer}
-									onClick={openAddDelayModal}
-								/>
-								<MenuItem
-									label={"Type message"}
-									icon={MdKeyboard}
-									onClick={openAddKeyboardCommandModal}
-								/>
-							</Menu>
+								beginRecording={beginRecording}
+								openAddKeyboardCommandModal={
+									openAddKeyboardCommandModal
+								}
+								openAddDelayModal={openAddDelayModal}
+								addPromptAction={addPromptAction}
+							/>
 						</div>
 					</div>
 					{actions.length ? (
@@ -276,103 +322,36 @@ const AddShortcutModal = ({
 													draggableId={action.id}
 												>
 													{(provided, snapshot) => (
-														<div
-															ref={
+														<ShortcutAction
+															innerRef={
 																provided.innerRef
 															}
-															style={
-																provided
-																	.draggableProps
-																	.style
+															provided={provided}
+															snapshot={snapshot}
+															action={action}
+															index={index}
+															updateActionPlacementIndex={
+																updateActionPlacementIndex
 															}
-															{...provided.draggableProps}
-															className={`px-3 py-3 rounded-lg text-xs flex items-center space-x-4 font-semibold group hover:bg-indigo-500 transition text-center ${
-																snapshot.isDragging
-																	? "bg-white shadow-lg"
-																	: "bg-indigo-50"
-															}`}
-														>
-
-															<div className="rounded-full w-8 h-8 bg-indigo-100 flex items-center group-hover:bg-white justify-center text-indigo-800 group-hover:shadow-lg" style={{minWidth: "calc(.25rem * 8)"}} {...provided.dragHandleProps}>
-																<div className={"hidden group-hover:block"}><MdDragHandle size={18}/></div>
-																<div className={"group-hover:hidden"}>{index + 1}</div>
-															</div>
-
-															<div
-																className={
-																	"opacity-90 text-xs flex flex-col text-left space-y-1"
-																}
-																style={{
-																	minWidth: 100
-																}}
-															>
-																{action.position ||
-																action.message ||
-																action.duration ? (
-																	<div className="group-hover:text-white">
-																		{action.position ? (
-																			<div>
-																				{
-																					action
-																						.position
-																						.x
-																				}
-
-																				,{" "}
-																				{
-																					action
-																						.position
-																						.y
-																				}
-																			</div>
-																		) : null}
-
-																		{action
-																			.message
-																			?.length ? (
-																			<div>
-																				{action.message ===
-																				"\t"
-																					? "TAB"
-																					: action.message ===
-																					  "\r"
-																					? "ENTER"
-																					: `"${action.message}"`}
-																			</div>
-																		) : null}
-
-																		{action.duration ? (
-																			<div className="space-x-1 whitespace-nowrap flex w-full">
-																				<div>
-																					{
-																						action.duration
-																					}
-																				</div>
-																				<div className="font-semibold opacity-80">
-																					MS
-																				</div>
-																			</div>
-																		) : null}
-																	</div>
-																) : null}
-																<div
-																	className={
-																		"text-xs capitalize opacity-70 group-hover:text-white"
-																	}
-																>
-																	{
-																		action.type
-																	}
-																</div>
-															</div>
-															<div className={"w-full transition flex space-x-2 items-center justify-end opacity-0 pointer-events-none group-hover:pointer-events-auto group-hover:opacity-100 group-hover:translate-y-0 translate-y-1.5 transform ease-in-out"}>
-																<div className={"transform rotate-180 cursor-pointer"}>
-																	<Button icon={RiMapPinAddLine} iconSize={18} className={"w-8 h-8 group-hover:text-white"}/>
-																</div>
-																<Button icon={RiMapPinAddLine} iconSize={18} className={"w-8 h-8 group-hover:text-white"}/>
-																<Button icon={FiTrash2} iconSize={18} className={"w-8 h-8 group-hover:text-white"} onClick={removeAction.bind(this, index)}/>
-															</div>
-														</div>
+															addPromptAction={
+																addPromptAction
+															}
+															ActionMenu={
+																ActionMenu
+															}
+															openAddDelayModal={
+																openAddDelayModal
+															}
+															openAddKeyboardCommandModal={
+																openAddKeyboardCommandModal
+															}
+															beginRecording={
+																beginRecording
+															}
+															remove={
+																removeAction
+															}
+														/>
 													)}
 												</Draggable>
 											);

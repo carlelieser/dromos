@@ -6,6 +6,7 @@ module.exports = {
 	},
 	variants: {
 		extend: {
+			width: ["group-hover"],
 			display: ["group-hover"],
 			translate: ["group-hover"],
 			scale: ["group-hover"],

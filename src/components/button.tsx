@@ -36,7 +36,7 @@ const Button = ({
 				if (onClick) onClick(e);
 			}}
 		>
-			{Icon ? <Icon size={iconSize}/> : null}
+			{Icon ? <Icon size={iconSize} /> : null}
 			{label ? (
 				<div
 					className={
