@@ -6,6 +6,8 @@ module.exports = {
 	},
 	variants: {
 		extend: {
+			display: ["group-hover"],
+			translate: ["group-hover"],
 			scale: ["group-hover"],
 			pointerEvents: ["group-hover", "hover", "focus"]
 		}
