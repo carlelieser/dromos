@@ -14,14 +14,6 @@ body::-webkit-scrollbar {
 	z-index: 100;
 }
 
-.hover\:pointer-events-auto:hover {
-	pointer-events: auto !important;
-}
-
-.group:hover .group-hover\:pointer-events-auto {
-	pointer-events: auto !important;
-}
-
 .hide-scrollbar::-webkit-scrollbar {
 	display: none;
 }
