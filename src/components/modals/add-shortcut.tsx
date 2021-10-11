@@ -6,9 +6,12 @@ import {
 	CgTrash,
 	MdArrowUpward,
 	MdClose,
+	MdDragHandle,
 	MdKeyboard,
 	MdMoreVert,
-	MdTimer
+	MdTimer,
+	FiTrash2,
+	RiMapPinAddLine
 } from "react-icons/all";
 import AddDelayModal from "./add-delay";
 import { ipcRenderer } from "electron";
@@ -283,36 +286,25 @@ const AddShortcutModal = ({
 																	.style
 															}
 															{...provided.draggableProps}
-															{...provided.dragHandleProps}
-															className={`px-3 py-3 rounded-lg text-xs flex items-center space-x-4 font-semibold relative group hover:bg-indigo-500 transition text-center ${
+															className={`px-3 py-3 rounded-lg text-xs flex items-center space-x-4 font-semibold group hover:bg-indigo-500 transition text-center ${
 																snapshot.isDragging
 																	? "bg-white shadow-lg"
 																	: "bg-indigo-50"
 															}`}
 														>
-															<div
-																className={
-																	"cursor-pointer transition ease-in-out group-hover:opacity-100 opacity-0 pointer-events-none group-hover:pointer-events-auto top-0 right-0 mr-1 mt-1 w-5 h-5 rounded-full absolute bg-black flex items-center justify-center hover:bg-red-500 transform scale-75 group-hover:scale-100 group shadow-lg"
-																}
-																onClick={removeAction.bind(
-																	this,
-																	index
-																)}
-															>
-																<MdClose
-																	className={
-																		"text-white opacity-90"
-																	}
-																/>
-															</div>
-															<div className="rounded-full w-8 h-8 bg-indigo-100 flex items-center group-hover:bg-white justify-center text-indigo-800 group-hover:shadow-lg">
-																{index + 1}
+
+															<div className="rounded-full w-8 h-8 bg-indigo-100 flex items-center group-hover:bg-white justify-center text-indigo-800 group-hover:shadow-lg" style={{minWidth: "calc(.25rem * 8)"}} {...provided.dragHandleProps}>
+																<div className={"hidden group-hover:block"}><MdDragHandle size={18}/></div>
+																<div className={"group-hover:hidden"}>{index + 1}</div>
 															</div>
 
 															<div
 																className={
 																	"opacity-90 text-xs flex flex-col text-left space-y-1"
 																}
+																style={{
+																	minWidth: 100
+																}}
 															>
 																{action.position ||
 																action.message ||
@@ -372,6 +364,13 @@ const AddShortcutModal = ({
 																		action.type
 																	}
 																</div>
+															</div>
+															<div className={"w-full transition flex space-x-2 items-center justify-end opacity-0 pointer-events-none group-hover:pointer-events-auto group-hover:opacity-100 group-hover:translate-y-0 translate-y-1.5 transform ease-in-out"}>
+																<div className={"transform rotate-180 cursor-pointer"}>
+																	<Button icon={RiMapPinAddLine} iconSize={18} className={"w-8 h-8 group-hover:text-white"}/>
+																</div>
+																<Button icon={RiMapPinAddLine} iconSize={18} className={"w-8 h-8 group-hover:text-white"}/>
+																<Button icon={FiTrash2} iconSize={18} className={"w-8 h-8 group-hover:text-white"} onClick={removeAction.bind(this, index)}/>
 															</div>
 														</div>
 													)}
