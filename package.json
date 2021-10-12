@@ -60,7 +60,7 @@
     "win": {
       "target": "nsis",
       "icon": "/build/logo512.png",
-      "artifactName": "${name}-${version}.${os}.setup.exe"
+      "artifactName": "${name}-${version}.${os}.setup.${ext}"
     }
   },
   "eslintConfig": {
