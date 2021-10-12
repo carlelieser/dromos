@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FiTrash2 } from "react-icons/fi";
 import { MdDragHandle } from "react-icons/md";
 import { RiMapPinAddLine } from "react-icons/ri";
@@ -18,20 +18,20 @@ const ShortcutAction = ({
 	addPromptAction,
 	updateActionPlacementIndex
 }) => {
-	const containerRef = useRef(null);
+	const [containerRef, setContainerRef] = useState<any>();
 
-	useEffect(() => {
-		console.log(provided.dragHandleProps)
-		innerRef(containerRef.current);
-	}, [containerRef]);
+	const updateRef = (ref) => {
+		setContainerRef(ref);
+		innerRef(ref);
+	};
 
 	return (
 		<div
-			ref={containerRef}
 			style={provided.draggableProps.style}
 			{...provided.draggableProps}
+			ref={updateRef}
 			className={`px-3 py-3 rounded-lg text-xs flex items-center space-x-4 font-semibold group hover:bg-indigo-500 transition text-center ${
-				snapshot.isDragging ? "bg-white shadow-lg" : "bg-indigo-50"
+				snapshot.isDragging ? "bg-white shadow-lg -mt-16" : "bg-indigo-50"
 			}`}
 		>
 			<div {...provided.dragHandleProps}>
@@ -112,7 +112,7 @@ const ShortcutAction = ({
 							/>
 						</div>
 					}
-					closeTarget={provided.innerRef}
+					closeTarget={containerRef?.current}
 					beginRecording={beginRecording}
 					openAddKeyboardCommandModal={openAddKeyboardCommandModal}
 					openAddDelayModal={openAddDelayModal}
@@ -120,7 +120,7 @@ const ShortcutAction = ({
 				/>
 
 				<ActionMenu
-					closeTarget={containerRef.current}
+					closeTarget={containerRef?.current}
 					menuButton={
 						<Button
 							icon={RiMapPinAddLine}
