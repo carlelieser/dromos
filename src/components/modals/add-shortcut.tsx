@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Button from "../button";
 import {
 	BiMessageAltDots,
@@ -83,18 +83,17 @@ const AddShortcutModal = ({
 	const [shortcut, setShortcut] = useState<IShortcut>();
 	const [actions, updateActions] = useState<Array<IAction>>([]);
 	const [recordingAction, setRecordingAction] = useState<boolean>(false);
-	const [actionPlacementIndex, setActionPlacementIndex] =
-		useState<number>(-1);
 	const [addDelayModalVisible, setAddDelayModalVisible] =
 		useState<boolean>(false);
 	const [addKeyboardCommandModalVisible, setAddKeyboardCommandModalVisible] =
 		useState<boolean>(false);
+	const actionPlacementIndexRef = useRef<number>();
 
 	const updateActionPlacementIndex = (
 		index: number,
 		callback?: () => void
 	) => {
-		setActionPlacementIndex(index);
+		actionPlacementIndexRef.current = index;
 		if (typeof callback === "function") callback();
 	};
 
@@ -157,15 +156,15 @@ const AddShortcutModal = ({
 
 	const handleAddShortcutAction = (e, action) => {
 		setRecordingAction(false);
-		if (actionPlacementIndex === -1) {
-			updateActions((prevActions) => [...prevActions, action]);
-		} else {
-			updateActions((prevActions) => {
-				let actions = [...prevActions];
-				actions.splice(actionPlacementIndex, 0, action);
-				return actions;
-			});
-		}
+		updateActions((prevActions) => {
+			let actions = [...prevActions];
+			actions.splice(
+				actionPlacementIndexRef.current ?? actions.length,
+				0,
+				action
+			);
+			return actions;
+		});
 	};
 
 	const handleShortcutNameChange = (e) => {
@@ -275,7 +274,7 @@ const AddShortcutModal = ({
 								className={"bg-indigo-500 text-white w-6 h-6"}
 								onClick={updateActionPlacementIndex.bind(
 									this,
-									-1,
+									actions.length,
 									beginRecording
 								)}
 							/>
@@ -286,7 +285,9 @@ const AddShortcutModal = ({
 										icon={MdMoreVert}
 										className={"bg-gray-50 w-6 h-6"}
 										onClick={() => {
-											updateActionPlacementIndex(-1);
+											updateActionPlacementIndex(
+												actions.length
+											);
 										}}
 									/>
 								}
