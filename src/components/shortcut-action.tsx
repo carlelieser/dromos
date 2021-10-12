@@ -31,7 +31,9 @@ const ShortcutAction = ({
 			{...provided.draggableProps}
 			ref={updateRef}
 			className={`px-3 py-3 rounded-lg text-xs flex items-center space-x-4 font-semibold group hover:bg-indigo-500 transition text-center ${
-				snapshot.isDragging ? "bg-white shadow-lg -mt-16" : "bg-indigo-50"
+				snapshot.isDragging
+					? "bg-white shadow-lg -mt-16"
+					: "bg-indigo-50"
 			}`}
 		>
 			<div {...provided.dragHandleProps}>
@@ -47,7 +49,6 @@ const ShortcutAction = ({
 					<div className={"group-hover:hidden"}>{index + 1}</div>
 				</div>
 			</div>
-
 
 			<div
 				className={
