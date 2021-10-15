@@ -1,7 +1,7 @@
 {
   "name": "dromos",
-  "description": "A simple app for automating desktop command sequences.",
-  "version": "0.1.0",
+  "description": "A simple electron app for managing and executing desktop command sequences.",
+  "version": "0.2.0",
   "private": true,
   "main": "build/main.js",
   "homepage": ".",
