@@ -5,7 +5,7 @@ interface IButtonProps {
 	label?: string;
 	className?: string;
 	icon?: IconType;
-	size?: number;
+	iconSize?: number;
 	bg?: string;
 	color?: string;
 	disabled?: boolean;
@@ -16,7 +16,7 @@ const Button = ({
 	label,
 	className,
 	icon,
-	size,
+	iconSize,
 	onClick,
 	disabled = false
 }: IButtonProps) => {
@@ -28,7 +28,7 @@ const Button = ({
 					? "opacity-70 pointer-events-none"
 					: "opacity-100 pointer-events-auto"
 			} ${
-				!label && icon ? `w-${size} h-${size}` : "px-6 py-2"
+				!label && icon ? "" : "px-6 py-2"
 			} rounded-full flex items-center justify-center  hover:bg-black hover:text-white cursor-pointer space-x-2 transition ease-in-out shadow-sm group ${
 				className ?? ""
 			}`}
@@ -36,7 +36,7 @@ const Button = ({
 				if (onClick) onClick(e);
 			}}
 		>
-			{Icon ? <Icon /> : null}
+			{Icon ? <Icon size={iconSize} /> : null}
 			{label ? (
 				<div
 					className={

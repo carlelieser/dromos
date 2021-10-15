@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Button from "../button";
 import {
 	BiMessageAltDots,
@@ -6,9 +6,12 @@ import {
 	CgTrash,
 	MdArrowUpward,
 	MdClose,
+	MdDragHandle,
 	MdKeyboard,
 	MdMoreVert,
-	MdTimer
+	MdTimer,
+	FiTrash2,
+	RiMapPinAddLine
 } from "react-icons/all";
 import AddDelayModal from "./add-delay";
 import { ipcRenderer } from "electron";
@@ -22,6 +25,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import UseAnimations from "react-useanimations";
 import infinity from "react-useanimations/lib/infinity";
 import AddTypingAction from "./add-typing-action";
+import ShortcutAction from "../shortcut-action";
 
 const clone = require("clone");
 
@@ -33,6 +37,40 @@ interface IAddShortcutModalProps {
 	removeShortcut: (id: string) => void;
 	defaultShortcut?: IShortcut;
 }
+
+const ActionMenu = ({
+	menuButton,
+	beginRecording,
+	openAddDelayModal,
+	openAddKeyboardCommandModal,
+	addPromptAction,
+	closeTarget
+}) => {
+	return (
+		<Menu closeTarget={closeTarget} menuButton={menuButton}>
+			<MenuItem
+				label={"Record action"}
+				icon={CgRecord}
+				onClick={beginRecording}
+			/>
+			<MenuItem
+				label={"Add prompt"}
+				icon={BiMessageAltDots}
+				onClick={addPromptAction}
+			/>
+			<MenuItem
+				label={"Add delay"}
+				icon={MdTimer}
+				onClick={openAddDelayModal}
+			/>
+			<MenuItem
+				label={"Type message"}
+				icon={MdKeyboard}
+				onClick={openAddKeyboardCommandModal}
+			/>
+		</Menu>
+	);
+};
 
 const AddShortcutModal = ({
 	title,
@@ -49,6 +87,15 @@ const AddShortcutModal = ({
 		useState<boolean>(false);
 	const [addKeyboardCommandModalVisible, setAddKeyboardCommandModalVisible] =
 		useState<boolean>(false);
+	const actionPlacementIndexRef = useRef<number>();
+
+	const updateActionPlacementIndex = (
+		index: number,
+		callback?: () => void
+	) => {
+		actionPlacementIndexRef.current = index;
+		if (typeof callback === "function") callback();
+	};
 
 	const openAddDelayModal = () => {
 		setAddDelayModalVisible(true);
@@ -109,7 +156,15 @@ const AddShortcutModal = ({
 
 	const handleAddShortcutAction = (e, action) => {
 		setRecordingAction(false);
-		updateActions((prevActions) => [...prevActions, action]);
+		updateActions((prevActions) => {
+			let actions = [...prevActions];
+			actions.splice(
+				actionPlacementIndexRef.current ?? actions.length,
+				0,
+				action
+			);
+			return actions;
+		});
 	};
 
 	const handleShortcutNameChange = (e) => {
@@ -157,8 +212,9 @@ const AddShortcutModal = ({
 				createdOn: Date.now()
 			}
 		);
-		ipcRenderer.removeAllListeners("add-shortcut-action");
+
 		ipcRenderer.on("add-shortcut-action", handleAddShortcutAction);
+
 		return () => {
 			ipcRenderer.removeAllListeners("add-shortcut-action");
 		};
@@ -217,37 +273,32 @@ const AddShortcutModal = ({
 							<Button
 								icon={MdAdd}
 								className={"bg-indigo-500 text-white w-6 h-6"}
-								onClick={beginRecording}
+								onClick={updateActionPlacementIndex.bind(
+									this,
+									actions.length,
+									beginRecording
+								)}
 							/>
-							<Menu
+							<ActionMenu
+								closeTarget={null}
 								menuButton={
 									<Button
 										icon={MdMoreVert}
 										className={"bg-gray-50 w-6 h-6"}
+										onClick={() => {
+											updateActionPlacementIndex(
+												actions.length
+											);
+										}}
 									/>
 								}
-							>
-								<MenuItem
-									label={"Record action"}
-									icon={CgRecord}
-									onClick={beginRecording}
-								/>
-								<MenuItem
-									label={"Add prompt"}
-									icon={BiMessageAltDots}
-									onClick={addPromptAction}
-								/>
-								<MenuItem
-									label={"Add delay"}
-									icon={MdTimer}
-									onClick={openAddDelayModal}
-								/>
-								<MenuItem
-									label={"Type message"}
-									icon={MdKeyboard}
-									onClick={openAddKeyboardCommandModal}
-								/>
-							</Menu>
+								beginRecording={beginRecording}
+								openAddKeyboardCommandModal={
+									openAddKeyboardCommandModal
+								}
+								openAddDelayModal={openAddDelayModal}
+								addPromptAction={addPromptAction}
+							/>
 						</div>
 					</div>
 					{actions.length ? (
@@ -273,107 +324,36 @@ const AddShortcutModal = ({
 													draggableId={action.id}
 												>
 													{(provided, snapshot) => (
-														<div
-															ref={
+														<ShortcutAction
+															innerRef={
 																provided.innerRef
 															}
-															style={
-																provided
-																	.draggableProps
-																	.style
+															provided={provided}
+															snapshot={snapshot}
+															action={action}
+															index={index}
+															updateActionPlacementIndex={
+																updateActionPlacementIndex
 															}
-															{...provided.draggableProps}
-															{...provided.dragHandleProps}
-															className={`px-3 py-3 rounded-lg text-xs flex items-center space-x-4 font-semibold relative group hover:bg-indigo-500 transition text-center ${
-																snapshot.isDragging
-																	? "bg-white shadow-lg"
-																	: "bg-indigo-50"
-															}`}
-														>
-															<div
-																className={
-																	"cursor-pointer transition ease-in-out group-hover:opacity-100 opacity-0 pointer-events-none group-hover:pointer-events-auto top-0 right-0 mr-1 mt-1 w-5 h-5 rounded-full absolute bg-black flex items-center justify-center hover:bg-red-500 transform scale-75 group-hover:scale-100 group shadow-lg"
-																}
-																onClick={removeAction.bind(
-																	this,
-																	index
-																)}
-															>
-																<MdClose
-																	className={
-																		"text-white opacity-90"
-																	}
-																/>
-															</div>
-															<div className="rounded-full w-8 h-8 bg-indigo-100 flex items-center group-hover:bg-white justify-center text-indigo-800 group-hover:shadow-lg">
-																{index + 1}
-															</div>
-
-															<div
-																className={
-																	"opacity-90 text-xs flex flex-col text-left space-y-1"
-																}
-															>
-																{action.position ||
-																action.message ||
-																action.duration ? (
-																	<div className="group-hover:text-white">
-																		{action.position ? (
-																			<div>
-																				{
-																					action
-																						.position
-																						.x
-																				}
-
-																				,{" "}
-																				{
-																					action
-																						.position
-																						.y
-																				}
-																			</div>
-																		) : null}
-
-																		{action
-																			.message
-																			?.length ? (
-																			<div>
-																				{action.message ===
-																				"\t"
-																					? "TAB"
-																					: action.message ===
-																					  "\r"
-																					? "ENTER"
-																					: `"${action.message}"`}
-																			</div>
-																		) : null}
-
-																		{action.duration ? (
-																			<div className="space-x-1 whitespace-nowrap flex w-full">
-																				<div>
-																					{
-																						action.duration
-																					}
-																				</div>
-																				<div className="font-semibold opacity-80">
-																					MS
-																				</div>
-																			</div>
-																		) : null}
-																	</div>
-																) : null}
-																<div
-																	className={
-																		"text-xs capitalize opacity-70 group-hover:text-white"
-																	}
-																>
-																	{
-																		action.type
-																	}
-																</div>
-															</div>
-														</div>
+															addPromptAction={
+																addPromptAction
+															}
+															ActionMenu={
+																ActionMenu
+															}
+															openAddDelayModal={
+																openAddDelayModal
+															}
+															openAddKeyboardCommandModal={
+																openAddKeyboardCommandModal
+															}
+															beginRecording={
+																beginRecording
+															}
+															remove={
+																removeAction
+															}
+														/>
 													)}
 												</Draggable>
 											);

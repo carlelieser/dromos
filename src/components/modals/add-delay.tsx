@@ -38,7 +38,7 @@ const AddDelayModal = ({ show, close, addDelayAction }) => {
 						<Button
 							label="Add"
 							icon={MdAdd}
-							className={"bg-indigo-500 text-white w-12 h-12"}
+							className={"bg-indigo-500 text-white"}
 							onClick={handleDelayAdd}
 						/>
 					</div>

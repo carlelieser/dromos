@@ -1,8 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, ReactNode } from "react";
 import { IconType } from "react-icons";
 import uuid from "uuid-random";
 
 const $ = require("jquery");
+
+interface IMenuProps {
+	menuButton: ReactNode;
+	closeTarget?: any;
+}
 
 interface IMenuItemProps {
 	label: string;
@@ -18,7 +23,7 @@ export const MenuItem = ({ label, icon, onClick }: IMenuItemProps) => {
 	return (
 		<div
 			className={
-				"px-4 py-2 whitespace-nowrap flex items-center space-x-2 hover:bg-gray-50"
+				"px-4 py-2 cursor-pointer whitespace-nowrap flex items-center space-x-2 hover:bg-gray-50"
 			}
 			onClick={handleClick}
 		>
@@ -28,7 +33,7 @@ export const MenuItem = ({ label, icon, onClick }: IMenuItemProps) => {
 	);
 };
 
-const Menu = ({ menuButton, children }) => {
+const Menu: React.FC<IMenuProps> = ({ menuButton, closeTarget, children }) => {
 	const [menuVisible, setMenuVisible] = useState<boolean>(false);
 	const [id, setId] = useState<string>();
 
@@ -64,17 +69,30 @@ const Menu = ({ menuButton, children }) => {
 		};
 	}, []);
 
+	useEffect(() => {
+		if (closeTarget) {
+			$(closeTarget).off("mouseleave");
+			$(closeTarget).on("mouseleave", closeMenu);
+		}
+
+		return () => {
+			$(closeTarget).off("mouseleave");
+		};
+	}, [closeTarget]);
+
 	return (
-		<div className={"relative z-100"} id={`menu-${id}`}>
-			<div onClick={handleOpenMenu}>{menuButton}</div>
+		<div id={`menu-${id}`}>
 			<div
-				className={`rounded-lg transition ease-in-out transform bg-white shadow-lg absolute top-0 right-0 font-semibold overflow-hidden text-xs ${
+				className={`menu rounded-lg transition z-50 ease-in-out right-0 mr-2 transform bg-white shadow-lg absolute font-semibold overflow-hidden text-xs ${
 					menuVisible
 						? "opacity-100 translate-y-0 pointer-events-auto"
 						: "opacity-0 translate-y-1.5 pointer-events-none"
 				}`}
 			>
 				{children}
+			</div>
+			<div className={"cursor-pointer"} onClick={handleOpenMenu}>
+				{menuButton}
 			</div>
 		</div>
 	);

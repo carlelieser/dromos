@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+html,
+body {
+	width: 100%;
+	height: 100%;
+}
+
 * {
 	user-select: none !important;
 }
@@ -14,18 +20,14 @@ body::-webkit-scrollbar {
 	z-index: 100;
 }
 
-.hover\:pointer-events-auto:hover {
-	pointer-events: auto !important;
-}
-
-.group:hover .group-hover\:pointer-events-auto {
-	pointer-events: auto !important;
-}
-
 .hide-scrollbar::-webkit-scrollbar {
 	display: none;
 }
 
-.pointer-events-none * {
+.pointer-events-none *:not(.menu):not(.menu *) {
 	pointer-events: none !important;
+}
+
+.group:hover .group-hover\:pointer-events-auto *:not(.menu):not(.menu *) {
+	pointer-events: auto !important;
 }
