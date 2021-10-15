@@ -212,8 +212,9 @@ const AddShortcutModal = ({
 				createdOn: Date.now()
 			}
 		);
-		ipcRenderer.removeAllListeners("add-shortcut-action");
+
 		ipcRenderer.on("add-shortcut-action", handleAddShortcutAction);
+
 		return () => {
 			ipcRenderer.removeAllListeners("add-shortcut-action");
 		};
