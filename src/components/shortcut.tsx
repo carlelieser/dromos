@@ -14,12 +14,18 @@ export interface ILoopData {
 	times: number;
 }
 
+interface IKeyboardCommand {
+	main: string;
+	modifiers: Array<string>;
+}
+
 export interface IAction {
 	id: string;
 	type: "mouse" | "keyboard" | "prompt" | "delay" | "loop";
 	loop?: ILoopData;
 	duration?: number;
 	position?: IMouseCoordinates;
+	keys?: IKeyboardCommand;
 	message?: string;
 }
 
