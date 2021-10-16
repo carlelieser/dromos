@@ -1,7 +1,7 @@
 import React from "react";
 import Header from "./components/header";
 import Shortcuts from "./components/shortcuts";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { IAction, IShortcut } from "./components/shortcut";
 import WaitForUserPrompt from "./components/modals/wait-for-user-prompt";
 import { ipcRenderer } from "electron";
@@ -17,7 +17,7 @@ const App = () => {
 	const [showAddShortcutModal, setShowAddShortcutModal] =
 		useState<boolean>(false);
 	const [showPromptModal, setShowPromptModal] = useState<boolean>(false);
-	const [promptPromise, setPromptPromise] = useState<IPromptPromiseRef>();
+	const promptPromiseRef = useRef<IPromptPromiseRef>();
 
 	const addShortcut = (shortcut: IShortcut) => {
 		let shortcutCopy = [...shortcuts];
@@ -56,11 +56,12 @@ const App = () => {
 	};
 
 	const closePromptModal = (continueExecution: boolean = false) => {
-		if (promptPromise) promptPromise.resolve(continueExecution);
+		if (promptPromiseRef.current)
+			promptPromiseRef.current.resolve(continueExecution);
 		setShowPromptModal(false);
 	};
 
-	const waitForPromptModalClose = () => {
+	const getUnresolvedPromiseRef = () => {
 		let refs: any = {};
 
 		const promise = new Promise((resolve, reject) => {
@@ -91,10 +92,16 @@ const App = () => {
 			} else if (action.type === "prompt") {
 				// ipcRenderer.send("show-main-window");
 				openPromptModal();
-				const promptRef = waitForPromptModalClose();
-				setPromptPromise(promptRef);
-				const shouldContinue = await promptRef.promise;
+				promptPromiseRef.current = getUnresolvedPromiseRef();
+				const shouldContinue = await promptPromiseRef.current.promise;
 				if (!shouldContinue) break;
+			} else if (action.type === "loop") {
+				if (action.loop) {
+					for (let i = 0; i < action.loop.times; i++) {
+						if (action.loop.actions)
+							await executeActions(action.loop.actions);
+					}
+				}
 			} else {
 				ipcRenderer.send("execute-action", action);
 			}
@@ -134,4 +141,5 @@ const App = () => {
 		</div>
 	);
 };
+
 export default App;

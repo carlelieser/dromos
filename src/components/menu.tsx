@@ -13,14 +13,17 @@ interface IMenuItemProps {
 	label: string;
 	onClick?: () => void;
 	icon?: IconType;
+	hide?: boolean;
 }
 
-export const MenuItem = ({ label, icon, onClick }: IMenuItemProps) => {
+export const MenuItem = ({ label, icon, hide, onClick }: IMenuItemProps) => {
 	const Icon = icon ?? null;
+
 	const handleClick = () => {
 		if (onClick) onClick();
 	};
-	return (
+
+	return hide ? null : (
 		<div
 			className={
 				"px-4 py-2 cursor-pointer whitespace-nowrap flex items-center space-x-2 hover:bg-gray-50"

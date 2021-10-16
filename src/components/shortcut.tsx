@@ -9,9 +9,15 @@ interface IMouseCoordinates {
 	y: number;
 }
 
+export interface ILoopData {
+	actions: Array<IAction>;
+	times: number;
+}
+
 export interface IAction {
 	id: string;
-	type: "mouse" | "keyboard" | "prompt" | "delay";
+	type: "mouse" | "keyboard" | "prompt" | "delay" | "loop";
+	loop?: ILoopData;
 	duration?: number;
 	position?: IMouseCoordinates;
 	message?: string;

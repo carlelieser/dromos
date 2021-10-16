@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
-import { FiTrash2 } from "react-icons/fi";
+import { FiCheck, FiTrash2, FiCircle } from "react-icons/fi";
 import { MdDragHandle } from "react-icons/md";
 import { RiMapPinAddLine } from "react-icons/ri";
+import { TiArrowRepeat } from "react-icons/ti";
 import Button from "./button";
+import Menu, { MenuItem } from "./menu";
 
 const ShortcutAction = ({
 	provided,
@@ -11,11 +13,10 @@ const ShortcutAction = ({
 	index,
 	action,
 	remove,
-	ActionMenu,
-	beginRecording,
-	openAddKeyboardCommandModal,
-	openAddDelayModal,
-	addPromptAction,
+	menu,
+	selectable,
+	selected,
+	toggleSelected,
 	updateActionPlacementIndex
 }) => {
 	const [containerRef, setContainerRef] = useState<any>();
@@ -34,21 +35,41 @@ const ShortcutAction = ({
 				snapshot.isDragging
 					? "bg-white shadow-lg -mt-16"
 					: "bg-indigo-50"
-			}`}
+			}
+			${selected ? "bg-indigo-500 text-white" : ""}
+			`}
 		>
-			<div {...provided.dragHandleProps}>
+			{selectable ? (
 				<div
-					className="rounded-full w-8 h-8 bg-indigo-100 flex items-center group-hover:bg-white justify-center text-indigo-800 group-hover:shadow-lg"
+					className="cursor-pointer rounded-full w-8 h-8 bg-indigo-100 flex items-center group-hover:bg-white justify-center text-indigo-800 group-hover:shadow-lg"
 					style={{
 						minWidth: "calc(.25rem * 8)"
 					}}
+					onClick={toggleSelected.bind(this, action.id)}
 				>
-					<div className={"hidden group-hover:block"}>
-						<MdDragHandle size={18} />
-					</div>
-					<div className={"group-hover:hidden"}>{index + 1}</div>
+					{selected ? <FiCheck /> : <FiCircle />}
 				</div>
-			</div>
+			) : (
+				<div {...provided.dragHandleProps}>
+					<div
+						className="rounded-full w-8 h-8 bg-indigo-100 flex items-center group-hover:bg-white justify-center text-indigo-800 group-hover:shadow-lg"
+						style={{
+							minWidth: "calc(.25rem * 8)"
+						}}
+					>
+						<div className={"hidden group-hover:block"}>
+							<MdDragHandle size={18} />
+						</div>
+						<div className={"group-hover:hidden"}>
+							{action.type === "loop" ? (
+								<TiArrowRepeat />
+							) : (
+								index + 1
+							)}
+						</div>
+					</div>
+				</div>
+			)}
 
 			<div
 				className={
@@ -58,7 +79,10 @@ const ShortcutAction = ({
 					minWidth: 100
 				}}
 			>
-				{action.position || action.message || action.duration ? (
+				{action.position ||
+				action.message ||
+				action.duration ||
+				action.loop ? (
 					<div className="group-hover:text-white">
 						{action.position ? (
 							<div>
@@ -66,13 +90,23 @@ const ShortcutAction = ({
 							</div>
 						) : null}
 
+						{action.loop ? (
+							<div className={"capitalize"}>
+								{action.loop.times +
+									" " +
+									(action.loop.times === 1
+										? "time"
+										: "times")}
+							</div>
+						) : null}
+
 						{action.message?.length ? (
-							<div>
+							<div className={"uppercase"}>
 								{action.message === "\t"
 									? "TAB"
 									: action.message === "\r"
 									? "ENTER"
-									: `"${action.message}"`}
+									: `"${action.message}`}
 							</div>
 						) : null}
 
@@ -99,7 +133,8 @@ const ShortcutAction = ({
 					"w-full transition flex space-x-2 items-center justify-end opacity-0 pointer-events-none group-hover:pointer-events-auto group-hover:opacity-100 group-hover:translate-y-0 translate-y-1.5 transform ease-in-out delay-75"
 				}
 			>
-				<ActionMenu
+				<Menu
+					closeTarget={containerRef?.current}
 					menuButton={
 						<div className={"transform rotate-180 cursor-pointer"}>
 							<Button
@@ -113,14 +148,16 @@ const ShortcutAction = ({
 							/>
 						</div>
 					}
-					closeTarget={containerRef?.current}
-					beginRecording={beginRecording}
-					openAddKeyboardCommandModal={openAddKeyboardCommandModal}
-					openAddDelayModal={openAddDelayModal}
-					addPromptAction={addPromptAction}
-				/>
+				>
+					{menu.map((item, index) => (
+						<MenuItem
+							key={`add-above-item-${index}-${action.id}`}
+							{...item}
+						/>
+					))}
+				</Menu>
 
-				<ActionMenu
+				<Menu
 					closeTarget={containerRef?.current}
 					menuButton={
 						<Button
@@ -133,11 +170,15 @@ const ShortcutAction = ({
 							)}
 						/>
 					}
-					beginRecording={beginRecording}
-					openAddKeyboardCommandModal={openAddKeyboardCommandModal}
-					openAddDelayModal={openAddDelayModal}
-					addPromptAction={addPromptAction}
-				/>
+				>
+					{menu.map((item) => (
+						<MenuItem
+							key={`add-below-item-${index}-${action.id}`}
+							{...item}
+						/>
+					))}
+				</Menu>
+
 				<Button
 					icon={FiTrash2}
 					iconSize={18}
