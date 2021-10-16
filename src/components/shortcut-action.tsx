@@ -116,7 +116,7 @@ const ShortcutAction = ({
 									? "TAB"
 									: action.message === "\r"
 									? "ENTER"
-									: `"${action.message}`}
+									: `"${action.message}"`}
 							</div>
 						) : null}
 
