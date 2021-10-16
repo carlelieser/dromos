@@ -81,6 +81,7 @@ const ShortcutAction = ({
 			>
 				{action.position ||
 				action.message ||
+				action.keys ||
 				action.duration ||
 				action.loop ? (
 					<div className="group-hover:text-white">
@@ -97,6 +98,15 @@ const ShortcutAction = ({
 									(action.loop.times === 1
 										? "time"
 										: "times")}
+							</div>
+						) : null}
+
+						{action.keys ? (
+							<div className={"uppercase"}>
+								{action.keys.modifiers.length
+									? `${action.keys.modifiers.join(" + ")} + `
+									: ""}
+								{action.keys.main}
 							</div>
 						) : null}
 
@@ -149,9 +159,9 @@ const ShortcutAction = ({
 						</div>
 					}
 				>
-					{menu.map((item, index) => (
+					{menu.map((item, itemIndex) => (
 						<MenuItem
-							key={`add-above-item-${index}-${action.id}`}
+							key={`add-above-item-${index}-${itemIndex}-${action.id}`}
 							{...item}
 						/>
 					))}
@@ -171,9 +181,9 @@ const ShortcutAction = ({
 						/>
 					}
 				>
-					{menu.map((item) => (
+					{menu.map((item, itemIndex) => (
 						<MenuItem
-							key={`add-below-item-${index}-${action.id}`}
+							key={`add-below-item-${index}-${itemIndex}-${action.id}`}
 							{...item}
 						/>
 					))}

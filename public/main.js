@@ -56,6 +56,7 @@ const createCaptureWindow = () => {
 		transparent: true,
 		fullscreen: true,
 		hasShadow: false,
+		frame: false,
 		webPreferences: {
 			nodeIntegration: true,
 			contextIsolation: false,
@@ -105,6 +106,11 @@ ipcMain.on("execute-action", (e, action) => {
 		robot.moveMouse(action.position.x, action.position.y);
 		robot.mouseClick("left");
 	} else if (action.type === "keyboard") {
+		if (action.keys) {
+			if (!action.keys.main) robot.keyTap(...action.keys.modifiers);
+			else robot.keyTap(action.keys.main, action.keys.modifiers);
+			return;
+		}
 		if (!action.message) return;
 		if (action.message.length === 1) robot.keyTap(action.message);
 		else robot.typeString(action.message);
