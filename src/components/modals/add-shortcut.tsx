@@ -393,7 +393,7 @@ const AddShortcutModal = ({
 					{actionSelectionUIVisible ? (
 						<div
 							className={
-								"mt-4 px-3 py-2 bg-indigo-500 rounded-lg w-full flex items-center space-x-2 shadow-sm text-xs"
+								"mt-4 px-3 py-2 bg-indigo-500 rounded-lg w-full flex items-center justify-center space-x-2 shadow-sm text-xs"
 							}
 						>
 							<div className={"opacity-70 hover:opacity-100"}>
@@ -408,23 +408,19 @@ const AddShortcutModal = ({
 							</div>
 							<Button
 								className={
-									"shadow-none bg-transparent hover:bg-indigo-900 text-white"
+									"w-8 h-8 shadow-none bg-transparent hover:bg-indigo-900 text-white"
 								}
-								label={
-									allActionsSelected
-										? "Deselect all"
-										: "Select all"
-								}
+								icon={allActionsSelected ? MdOutlineRemoveDone : MdOutlineDoneAll}
 								onClick={toggleSelectAll}
 							/>
-							<div
-								className={"h-8 rounded-lg bg-white opacity-10"}
-								style={{
-									width: 1
-								}}
-							></div>
 							{selectedActions.length ? (
 								<>
+									<div
+										className={"h-8 rounded-lg bg-white opacity-10"}
+										style={{
+											width: 1
+										}}
+									></div>
 									<div
 										className={
 											"flex items-center text-white space-x-2"
@@ -472,7 +468,7 @@ const AddShortcutModal = ({
 										</div>
 										<Button
 											className={
-												"w-8 h-8 shadow-none bg-indigo-200 hover:bg-indigo-900 hover:text-white text-center text-indigo-900"
+												"w-8 h-8 shadow-none bg-transparent hover:bg-indigo-900 text-white text-center"
 											}
 											icon={TiArrowRepeat}
 											iconSize={18}
