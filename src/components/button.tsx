@@ -6,8 +6,6 @@ interface IButtonProps {
 	className?: string;
 	icon?: IconType;
 	iconSize?: number;
-	bg?: string;
-	color?: string;
 	disabled?: boolean;
 	onClick?: (e: MouseEvent) => void;
 }

@@ -1,6 +1,6 @@
 import React from "react";
 import Shortcut, { IShortcut } from "./shortcut";
-import emptyState from "../empty-state.svg";
+import emptyStateBg from "../img/configuration.svg";
 import Button from "./button";
 import { MdAdd, MdPendingActions } from "react-icons/all";
 import AddShortcutModal from "./modals/add-shortcut";
@@ -65,7 +65,7 @@ const Shortcuts = ({
 						className={"flex flex-col items-center p-4 text-center"}
 					>
 						<div className={"p-8"}>
-							<img src={emptyState} />
+							<img src={emptyStateBg} />
 						</div>
 						<div className={"space-y-2"}>
 							<div className={"font-semibold opacity-80"}>

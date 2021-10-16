@@ -4,6 +4,7 @@ import {
 	BiMessageAltDots,
 	CgRecord,
 	CgTrash,
+	MdOutlineRemoveDone,
 	MdArrowUpward,
 	MdClose,
 	MdDragHandle,
@@ -11,12 +12,16 @@ import {
 	MdMoreVert,
 	MdTimer,
 	FiTrash2,
-	RiMapPinAddLine
+	RiMapPinAddLine,
+	TiArrowRepeat,
+	MdOutlineDoneAll,
+	FiChevronUp,
+	FiChevronDown
 } from "react-icons/all";
 import AddDelayModal from "./add-delay";
 import { ipcRenderer } from "electron";
-import { IAction, IShortcut } from "../shortcut";
-import emptyState from "../../actions-empty-state.svg";
+import { IAction, ILoopData, IShortcut } from "../shortcut";
+import emptyStateBg from "../../img/tasks.svg";
 import uuid from "uuid-random";
 import Modal from "../modal";
 import Menu, { MenuItem } from "../menu";
@@ -38,40 +43,6 @@ interface IAddShortcutModalProps {
 	defaultShortcut?: IShortcut;
 }
 
-const ActionMenu = ({
-	menuButton,
-	beginRecording,
-	openAddDelayModal,
-	openAddKeyboardCommandModal,
-	addPromptAction,
-	closeTarget
-}) => {
-	return (
-		<Menu closeTarget={closeTarget} menuButton={menuButton}>
-			<MenuItem
-				label={"Record action"}
-				icon={CgRecord}
-				onClick={beginRecording}
-			/>
-			<MenuItem
-				label={"Add prompt"}
-				icon={BiMessageAltDots}
-				onClick={addPromptAction}
-			/>
-			<MenuItem
-				label={"Add delay"}
-				icon={MdTimer}
-				onClick={openAddDelayModal}
-			/>
-			<MenuItem
-				label={"Type message"}
-				icon={MdKeyboard}
-				onClick={openAddKeyboardCommandModal}
-			/>
-		</Menu>
-	);
-};
-
 const AddShortcutModal = ({
 	title,
 	show,
@@ -82,11 +53,20 @@ const AddShortcutModal = ({
 }: IAddShortcutModalProps) => {
 	const [shortcut, setShortcut] = useState<IShortcut>();
 	const [actions, updateActions] = useState<Array<IAction>>([]);
+	const [selectedActions, updateSelectedActions] = useState<Array<string>>(
+		[]
+	);
+	const [allActionsSelected, setAllActionsSelected] = useState<boolean>();
+
 	const [recordingAction, setRecordingAction] = useState<boolean>(false);
 	const [addDelayModalVisible, setAddDelayModalVisible] =
 		useState<boolean>(false);
 	const [addKeyboardCommandModalVisible, setAddKeyboardCommandModalVisible] =
 		useState<boolean>(false);
+	const [actionSelectionUIVisible, setActionSelectionUIVisible] =
+		useState<boolean>();
+	const [loopAmount, setLoopAmount] = useState<number>(1);
+
 	const actionPlacementIndexRef = useRef<number>();
 
 	const updateActionPlacementIndex = (
@@ -142,6 +122,24 @@ const AddShortcutModal = ({
 
 	const addKeyboardCommandAction = (command: IAction) => {
 		handleAddShortcutAction(null, command);
+	};
+
+	const addLoopAction = () => {
+		const loopableActions = actions.filter((action) =>
+			selectedActions.includes(action.id)
+		);
+		const action: IAction = {
+			id: uuid(),
+			type: "loop",
+			loop: {
+				actions: loopableActions,
+				times: loopAmount
+			}
+		};
+
+		handleAddShortcutAction(null, action);
+		deselectAllActions();
+		hideActionSelectionUI();
 	};
 
 	const beginRecording = () => {
@@ -202,6 +200,92 @@ const AddShortcutModal = ({
 		setRecordingAction(false);
 	};
 
+	const showActionSelectionUI = () => {
+		setActionSelectionUIVisible(true);
+	};
+
+	const hideActionSelectionUI = () => {
+		setActionSelectionUIVisible(false);
+	};
+
+	const selectAllActions = () => {
+		updateSelectedActions(actions.map((action) => action.id));
+	};
+
+	const deselectAllActions = () => {
+		updateSelectedActions([]);
+	};
+
+	const toggleSelectAll = () => {
+		const allSelected = selectedActions.length === actions.length;
+		if (allSelected) deselectAllActions();
+		else selectAllActions();
+	};
+
+	const handleSelectionCancel = () => {
+		deselectAllActions();
+		hideActionSelectionUI();
+	};
+
+	const handleLoopAmountChange = (e) => {
+		const numbers = e.target.value.match(/\d+/g);
+		setLoopAmount(numbers ? numbers[0] : "");
+	};
+
+	const handleLoopAmountClick = (e) => {
+		e.target.select();
+	};
+
+	const incrementLoopAmount = () => {
+		setLoopAmount((prevLoopAmount) => Number(prevLoopAmount) + 1);
+	};
+
+	const decrementLoopAmount = () => {
+		setLoopAmount((prevLoopAmount) => {
+			let newAmount = Number(prevLoopAmount) - 1;
+			return newAmount < 1 ? 1 : newAmount;
+		});
+	};
+
+	const toggleActionSelected = (id: string) => {
+		const selectedActionsClone = clone(selectedActions);
+		const index = selectedActionsClone.indexOf(id);
+
+		if (index > -1) selectedActionsClone.splice(index, 1);
+		else selectedActionsClone.push(id);
+
+		updateSelectedActions(selectedActionsClone);
+	};
+
+	const menu = [
+		{
+			label: "Record action",
+			icon: CgRecord,
+			onClick: beginRecording
+		},
+		{
+			label: "Add prompt",
+			icon: BiMessageAltDots,
+			onClick: addPromptAction
+		},
+		{
+			label: "Add delay",
+			icon: MdTimer,
+			onClick: openAddDelayModal
+		},
+		{
+			label: "Type message",
+			icon: MdKeyboard,
+			onClick: openAddKeyboardCommandModal
+		},
+		{
+			label: "Create loop",
+			icon: TiArrowRepeat,
+			onClick: showActionSelectionUI,
+			hide: actions.length === 0
+		}
+	];
+
 	useEffect(() => {
 		updateActions(defaultShortcut ? defaultShortcut.actions : []);
 		setShortcut(
@@ -241,6 +325,10 @@ const AddShortcutModal = ({
 		setShortcut(sc);
 	}, [actions]);
 
+	useEffect(() => {
+		setAllActionsSelected(selectedActions.length === actions.length);
+	}, [actions, selectedActions]);
+
 	return (
 		<>
 			<Modal title={title} show={show} close={close}>
@@ -279,7 +367,7 @@ const AddShortcutModal = ({
 									beginRecording
 								)}
 							/>
-							<ActionMenu
+							<Menu
 								closeTarget={null}
 								menuButton={
 									<Button
@@ -292,15 +380,109 @@ const AddShortcutModal = ({
 										}}
 									/>
 								}
-								beginRecording={beginRecording}
-								openAddKeyboardCommandModal={
-									openAddKeyboardCommandModal
-								}
-								openAddDelayModal={openAddDelayModal}
-								addPromptAction={addPromptAction}
-							/>
+							>
+								{menu.map((item, index) => (
+									<MenuItem
+										key={`main-overflow-item-${index}`}
+										{...item}
+									/>
+								))}
+							</Menu>
 						</div>
 					</div>
+					{actionSelectionUIVisible ? (
+						<div
+							className={
+								"mt-4 px-3 py-2 bg-indigo-500 rounded-lg w-full flex items-center space-x-2 shadow-sm text-xs"
+							}
+						>
+							<div className={"opacity-70 hover:opacity-100"}>
+								<Button
+									className={
+										"w-8 h-8 shadow-none bg-transparent hover:bg-indigo-900 text-white"
+									}
+									icon={MdClose}
+									iconSize={14}
+									onClick={handleSelectionCancel}
+								/>
+							</div>
+							<Button
+								className={
+									"shadow-none bg-transparent hover:bg-indigo-900 text-white"
+								}
+								label={
+									allActionsSelected
+										? "Deselect all"
+										: "Select all"
+								}
+								onClick={toggleSelectAll}
+							/>
+							<div
+								className={"h-8 rounded-lg bg-white opacity-10"}
+								style={{
+									width: 1
+								}}
+							></div>
+							{selectedActions.length ? (
+								<>
+									<div
+										className={
+											"flex items-center text-white space-x-2"
+										}
+									>
+										<div
+											className={
+												"flex items-center space-x-2"
+											}
+										>
+											<div
+												className={
+													"flex flex-col items-center justify-center space-y-1"
+												}
+											>
+												<FiChevronUp
+													className={
+														"opacity-50 hover:opacity-100"
+													}
+													onClick={
+														incrementLoopAmount
+													}
+												/>
+												<FiChevronDown
+													className={
+														"opacity-50 hover:opacity-100"
+													}
+													onClick={
+														decrementLoopAmount
+													}
+												/>
+											</div>
+											<input
+												className={
+													"bg-transparent border-b-2 border-white py-2 w-8 h-full outline-none font-semibold"
+												}
+												type={"text"}
+												value={loopAmount}
+												onClick={handleLoopAmountClick}
+												onChange={
+													handleLoopAmountChange
+												}
+												placeholder={"1"}
+											/>
+										</div>
+										<Button
+											className={
+												"w-8 h-8 shadow-none bg-indigo-200 hover:bg-indigo-900 hover:text-white text-center text-indigo-900"
+											}
+											icon={TiArrowRepeat}
+											iconSize={18}
+											onClick={addLoopAction}
+										/>
+									</div>
+								</>
+							) : null}
+						</div>
+					) : null}
 					{actions.length ? (
 						<DragDropContext onDragEnd={onDragEnd}>
 							<Droppable droppableId={"actions"}>
@@ -323,38 +505,43 @@ const AddShortcutModal = ({
 													index={index}
 													draggableId={action.id}
 												>
-													{(provided, snapshot) => (
-														<ShortcutAction
-															innerRef={
-																provided.innerRef
-															}
-															provided={provided}
-															snapshot={snapshot}
-															action={action}
-															index={index}
-															updateActionPlacementIndex={
-																updateActionPlacementIndex
-															}
-															addPromptAction={
-																addPromptAction
-															}
-															ActionMenu={
-																ActionMenu
-															}
-															openAddDelayModal={
-																openAddDelayModal
-															}
-															openAddKeyboardCommandModal={
-																openAddKeyboardCommandModal
-															}
-															beginRecording={
-																beginRecording
-															}
-															remove={
-																removeAction
-															}
-														/>
-													)}
+													{(provided, snapshot) => {
+														const selected =
+															selectedActions.includes(
+																action.id
+															);
+														return (
+															<ShortcutAction
+																innerRef={
+																	provided.innerRef
+																}
+																provided={
+																	provided
+																}
+																snapshot={
+																	snapshot
+																}
+																action={action}
+																index={index}
+																menu={menu}
+																selectable={
+																	actionSelectionUIVisible
+																}
+																selected={
+																	selected
+																}
+																toggleSelected={
+																	toggleActionSelected
+																}
+																updateActionPlacementIndex={
+																	updateActionPlacementIndex
+																}
+																remove={
+																	removeAction
+																}
+															/>
+														);
+													}}
 												</Draggable>
 											);
 										})}
@@ -370,7 +557,7 @@ const AddShortcutModal = ({
 							}
 						>
 							<div className={"p-4"}>
-								<img src={emptyState} className={"h-14"} />
+								<img src={emptyStateBg} className={"h-14"} />
 							</div>
 							<div className={"space-y-2"}>
 								<div
