@@ -16,7 +16,7 @@ app.commandLine.appendSwitch("disable-renderer-backgrounding");
 function createWindow() {
 	const size = {
 		width: 350,
-		height: 540
+		height: 560
 	};
 	mainWindow = new BrowserWindow({
 		width: size.width,
@@ -63,7 +63,7 @@ const createCaptureWindow = () => {
 		}
 	});
 
-	captureWindow.loadFile(path.join(__dirname, "empty.html"));
+	captureWindow.loadFile(path.join(__dirname, "capture.html"));
 
 	return captureWindow;
 };
