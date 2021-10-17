@@ -44,13 +44,13 @@ interface IAddShortcutModalProps {
 }
 
 const AddShortcutModal = ({
-							  title,
-							  show,
-							  close,
-							  addShortcut,
-							  removeShortcut,
-							  defaultShortcut
-						  }: IAddShortcutModalProps) => {
+	title,
+	show,
+	close,
+	addShortcut,
+	removeShortcut,
+	defaultShortcut
+}: IAddShortcutModalProps) => {
 	const [shortcut, setShortcut] = useState<IShortcut>();
 	const [actions, updateActions] = useState<Array<IAction>>([]);
 	const [selectedActions, updateSelectedActions] = useState<Array<string>>(
@@ -364,7 +364,9 @@ const AddShortcutModal = ({
 								menuButton={
 									<Button
 										icon={MdAdd}
-										className={"bg-indigo-500 text-white w-6 h-6"}
+										className={
+											"bg-indigo-500 text-white w-6 h-6"
+										}
 										onClick={() => {
 											updateActionPlacementIndex(
 												actions.length
@@ -402,13 +404,19 @@ const AddShortcutModal = ({
 								className={
 									"w-8 h-8 shadow-none bg-transparent hover:bg-indigo-900 text-white"
 								}
-								icon={allActionsSelected ? MdOutlineRemoveDone : MdOutlineDoneAll}
+								icon={
+									allActionsSelected
+										? MdOutlineRemoveDone
+										: MdOutlineDoneAll
+								}
 								onClick={toggleSelectAll}
 							/>
 							{selectedActions.length ? (
 								<>
 									<div
-										className={"h-8 rounded-lg bg-white opacity-10"}
+										className={
+											"h-8 rounded-lg bg-white opacity-10"
+										}
 										style={{
 											width: 1
 										}}
