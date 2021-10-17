@@ -44,13 +44,13 @@ interface IAddShortcutModalProps {
 }
 
 const AddShortcutModal = ({
-	title,
-	show,
-	close,
-	addShortcut,
-	removeShortcut,
-	defaultShortcut
-}: IAddShortcutModalProps) => {
+							  title,
+							  show,
+							  close,
+							  addShortcut,
+							  removeShortcut,
+							  defaultShortcut
+						  }: IAddShortcutModalProps) => {
 	const [shortcut, setShortcut] = useState<IShortcut>();
 	const [actions, updateActions] = useState<Array<IAction>>([]);
 	const [selectedActions, updateSelectedActions] = useState<Array<string>>(
@@ -319,6 +319,7 @@ const AddShortcutModal = ({
 	}, [show]);
 
 	useEffect(() => {
+		console.log(actions);
 		if (!shortcut) return;
 		let sc = clone(shortcut);
 		sc.actions = clone(actions);
@@ -358,21 +359,12 @@ const AddShortcutModal = ({
 					<div className={"flex items-center justify-between"}>
 						<div className={"font-semibold"}>Sequence</div>
 						<div className={"flex items-center space-x-4"}>
-							<Button
-								icon={MdAdd}
-								className={"bg-indigo-500 text-white w-6 h-6"}
-								onClick={updateActionPlacementIndex.bind(
-									this,
-									actions.length,
-									beginRecording
-								)}
-							/>
 							<Menu
 								closeTarget={null}
 								menuButton={
 									<Button
-										icon={MdMoreVert}
-										className={"bg-gray-50 w-6 h-6"}
+										icon={MdAdd}
+										className={"bg-indigo-500 text-white w-6 h-6"}
 										onClick={() => {
 											updateActionPlacementIndex(
 												actions.length

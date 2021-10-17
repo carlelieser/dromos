@@ -28,7 +28,7 @@ const AddTypingAction = ({ show, close, addKeyboardCommandAction }) => {
 		};
 
 		setKeyboardAction(defaultKeyboardAction);
-	}, []);
+	}, [show]);
 
 	return (
 		<Modal
