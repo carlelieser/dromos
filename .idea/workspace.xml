@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="c20fbf09-9e83-4453-ac9d-3f4ff2d035e1" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/renderer/src/assets/css/main.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/renderer/src/components/navbar.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/renderer/src/components/shortcut.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/renderer/src/components/shortcuts.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/renderer/src/contexts/shortcut.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/renderer/src/providers/shortcut.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/renderer/src/routes/shortcut/edit.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/renderer/src/store.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/renderer/src/types.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.prettierrc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/craco.config.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/capture.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/favicon.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/logo192.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/logo512.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/main.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/manifest.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/robots.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/button.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/header.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/logo.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/menu.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/modal.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/modals/add-delay.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/modals/add-shortcut.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/modals/add-typing-action.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/modals/wait-for-user-prompt.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/shortcut-action.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/shortcut.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/shortcuts.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/img/configuration.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/src/assets/images/configuration.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/img/logo.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/src/assets/images/logo.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/img/tasks.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/src/assets/images/tasks.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/index.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/index.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/react-app-env.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tailwind.config.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tsconfig.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="EditorConfigPreviewManager">
+    <editorConfig file="$PROJECT_DIR$/.editorconfig" previewFile="$PROJECT_DIR$/src/main/index.ts" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
+  <component name="ProjectId" id="2mlGs6gnTrnBwHhWdkezGnM3KqD" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="autoscrollToSource" value="true" />
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Carlos/Documents/Projects/Development/dromos/dromos/src/renderer/src/assets&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_interpreter_path&quot;: &quot;node&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
+    &quot;npm.typecheck:web.executor&quot;: &quot;Run&quot;,
+    &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;C:\\Users\\Carlos\\Documents\\Projects\\Development\\dromos\\node_modules\\prettier&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;settings.typescriptcompiler&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\Carlos\\Documents\\Projects\\Development\\dromos\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="ReactDesignerToolWindowState">
+    <option name="myId2Visible">
+      <map>
+        <entry key="com.intellij.reactbuddy.reactComponents" value="false" />
+        <entry key="com.intellij.reactbuddy.reactInspector" value="false" />
+        <entry key="com.intellij.reactbuddy.storybook" value="false" />
+      </map>
+    </option>
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Carlos\Documents\Projects\Development\dromos\dromos\src\renderer\src\assets" />
+      <recent name="C:\Users\Carlos\Documents\Projects\Development\dromos\dromos\src\renderer\src\components" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Carlos\Documents\Projects\Development\dromos\src\renderer\src" />
+      <recent name="C:\Users\Carlos\Documents\Projects\Development\dromos\src\renderer\src\components" />
+      <recent name="C:\Users\Carlos\Documents\Projects\Development\dromos\src\renderer\src\assets\css" />
+      <recent name="C:\Users\Carlos\Documents\Projects\Development\dromos" />
+    </key>
+  </component>
+  <component name="RunManager" selected="npm.dev">
+    <configuration name="dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="dev" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="typecheck:web" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="typecheck:web" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="npm.dev" />
+        <item itemvalue="npm.typecheck:web" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="c20fbf09-9e83-4453-ac9d-3f4ff2d035e1" name="Changes" comment="" />
+      <created>1727643955359</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1727643955359</updated>
+      <workItem from="1727643957735" duration="7306000" />
+      <workItem from="1727657451171" duration="1846000" />
+      <workItem from="1727664739540" duration="1863000" />
+      <workItem from="1727666779062" duration="187000" />
+      <workItem from="1727666987062" duration="5272000" />
+      <workItem from="1727672284825" duration="128000" />
+      <workItem from="1727672444906" duration="747000" />
+      <workItem from="1727683886881" duration="631000" />
+      <workItem from="1727733992318" duration="4050000" />
+      <workItem from="1727760529846" duration="988000" />
+      <workItem from="1727761539819" duration="578000" />
+      <workItem from="1727762129289" duration="353000" />
+      <workItem from="1727762499490" duration="600000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
